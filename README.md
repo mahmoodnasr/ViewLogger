@@ -4,8 +4,10 @@ ViewLogger is a simple Django app Log view hits over time so that you know who e
  
 ## Installation
 
-* Clone the package
-
+* Install the package
+```sh
+pip install ViewLogger
+```
 * Add Application to your project's INSTALLED_APPs
 ```python
 INSTALLED_APPS = (
