@@ -10,18 +10,16 @@ class ViewLoggerMiddleware(object):
         body_data = request.GET if request.method == 'GET' else request.POST
         view = view_func.func_name
         path = request.META["PATH_INFO"]
-        VIEWLOGGER_EXEMPTED_METHODS = ['']
-        if hasattr(conf_settings, 'VIEWLOGGER_EXEMPTED_METHODS'):
-            for i in conf_settings.VIEWLOGGER_EXEMPTED_METHODS:
-                VIEWLOGGER_EXEMPTED_METHODS.append(i.lower())
-        else :
-            VIEWLOGGER_EXEMPTED_METHODS = ['post','get']
+
+        VIEWLOGGER_METHODS = getattr(conf_settings, 'VIEWLOGGER_METHODS',['post','get'])
+        for i in conf_settings.VIEWLOGGER_METHODS: VIEWLOGGER_METHODS.append(i.lower())
+
         EXEMPTED_VIEWS = conf_settings.VIEWLOGGER_EXEMPTED_VIEWS if hasattr(conf_settings, 'VIEWLOGGER_EXEMPTED_VIEWS') else ("")
         EXEMPTED_PATHS = conf_settings.VIEWLOGGER_EXEMPTED_PATHS if hasattr(conf_settings, 'VIEWLOGGER_EXEMPTED_PATHS') else ("")
         if not "/__debug__/" in path \
                 and not path in EXEMPTED_PATHS \
                 and not view in EXEMPTED_VIEWS \
-                and request.method.lower() in VIEWLOGGER_EXEMPTED_METHODS:
+                and request.method.lower() in VIEWLOGGER_METHODS:
             log = Log()
             log.request_body = body_data
             log.url = request.get_full_path()
