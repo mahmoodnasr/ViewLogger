@@ -1,0 +1,99 @@
+<html>
+<head>
+    <link href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <style>
+        #ViewLoggerTable ul {
+            list-style: none;
+            padding-left: 0;
+        }
+    </style>
+</head>
+<body class="container" style="width: 100%">
+<div style=""><h4 style="font-weight: bold;">View Logger</h4></div>
+<form action="{% url 'LogMain' %}" method="post">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-4 label-div"><label>{{ form.view_name.label }}</label></div>
+        <div class="col-md-8"><label>{{ form.view_name }}</label></div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 label-div"><label>{{ form.request_method.label }}</label></div>
+        <div class="col-md-8"><label>{{ form.request_method }}</label></div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 label-div"><label>{{ form.url.label }}</label></div>
+        <div class="col-md-8"><label>{{ form.url }}</label></div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 label-div"><label>{{ form.done_by.label }}</label></div>
+        <div class="col-md-8"><label>{{ form.done_by }}</label></div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 label-div"><label>{{ form.done_on.label }}</label></div>
+        <div class="col-md-8"><label>{{ form.done_on }}</label></div>
+    </div>
+    <br/>
+    <div class="row">
+        <div class="col-md-6" align="center">
+            <button type="submit" class="btn btn-primary">Get History</button>
+        </div>
+    </div>
+
+
+</form>
+{% if count > 0 %}
+    <div class="table-responsive-sm" id="ViewLoggerTable">
+        <table class="table table-hover table-bordered">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">URL</th>
+                <th scope="col">View Args</th>
+                <th scope="col">View Kwargs</th>
+                <th scope="col">Request Method</th>
+                <th scope="col">Request Body</th>
+                <th scope="col">Done By</th>
+                <th scope="col">Done On</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for change in changes %}
+                <tr>
+                    <th scope="row">{{ change.id }}</th>
+                    <td>{{ change.url }}</td>
+                    <td>
+                        <ul>
+                            {% for k,v in change.view_args.items %}
+                                <li>{{ k }} : {{ v }}</li>{% endfor %}
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            {% for k,v in change.view_kwargs.items %}
+                                <li>{{ k }} : {{ v }}</li>{% endfor %}
+                        </ul>
+                    </td>
+                    <td>{{ change.request_method }}</td>
+                    <td style="width: 30%">
+                        <ul>
+                            {% for k,v in change.request_body.items %}
+                                <li>{{ k }} : {{ v }}</li>{% endfor %}
+                        </ul>
+                    </td>
+                    <td>{{ change.by }}</td>
+                    <td>{{ change.event_time }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+{% else %}
+    <div class="alert alert-danger">
+        No Changes found for {{ id }}.
+    </div>
+{% endif %}
+</body>
+</html>
