@@ -10,7 +10,7 @@ from django.http import HttpResponse
 
 def mainViewLogger(request):
     res = {}
-    views = [(s['view_name'], s['view_name']) for s in Log.objects.values("view_name").distinct()]
+    views = [(s['view_name'], s['view_name']) for s in Log.objects.values("view_name").distinct().order_by("view_name")]
     if request.method == "GET":
         res["form"] = ViewLogger_Form(views=views)
         # export_format = request.GET.get('_export', None)

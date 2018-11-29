@@ -56,19 +56,22 @@
             <thead>
             <tr>
                 <th scope="col">#</th>
+                <th scope="col">Done By</th>
+                <th scope="col">Done On</th>
                 <th scope="col">URL</th>
                 <th scope="col">View Args</th>
                 <th scope="col">View Kwargs</th>
                 <th scope="col">Request Method</th>
                 <th scope="col">Request Body</th>
-                <th scope="col">Done By</th>
-                <th scope="col">Done On</th>
+
             </tr>
             </thead>
             <tbody>
             {% for change in changes %}
                 <tr>
                     <th scope="row">{{ change.id }}</th>
+                    <td>{{ change.by }}</td>
+                    <td>{{ change.event_time }}</td>
                     <td>{{ change.url }}</td>
                     <td>
                         <ul>
@@ -89,8 +92,6 @@
                                 <li>{{ k }} : {{ v }}</li>{% endfor %}
                         </ul>
                     </td>
-                    <td>{{ change.by }}</td>
-                    <td>{{ change.event_time }}</td>
                 </tr>
             {% endfor %}
             </tbody>

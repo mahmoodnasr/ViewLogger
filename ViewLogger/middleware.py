@@ -6,6 +6,7 @@ from django.conf import settings as conf_settings
 class ViewLoggerMiddleware(object):
 
     def process_view(self, request, view_func, view_args, view_kwargs):
+        maxColumnSize = 10
         username = request.user.username if request.user else "None"
         body_data = request.GET if request.method == 'GET' else request.POST
         view = view_func.func_name
@@ -23,7 +24,7 @@ class ViewLoggerMiddleware(object):
                     if item not in EXEMPTED_PARAMETER:
                         requestBody[item] = body_data[item]
                     else:
-                        requestBody[item] = len(body_data[item]) * "*"
+                        requestBody[item] = len(body_data[item]) * "*" if len(body_data[item]) < maxColumnSize else maxColumnSize * "*" + (5 * ".")
             else:
                 requestBody = body_data
             log.request_body = requestBody
