@@ -23,11 +23,6 @@ MIDDLEWARE_CLASSES = (
     )
 ```   
 
-* Add `django.contrib.sessions.serializers.PickleSerializer` to your SESSION_SERIALIZER in setting.py .
-```python
-SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
-```   
-
 * Run Migrations
 ```sh
    python manage.py migrate ViewLogger 

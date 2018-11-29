@@ -18,10 +18,11 @@ class ViewLoggerMiddleware(object):
         if not path in EXEMPTED_PATHS and not view in EXEMPTED_VIEWS and request.method.lower() in VIEWLOGGER_METHODS:
             log = Log()
             body_data._mutable = True
+            requestBody = body_data
             if EXEMPTED_PARAMETER:
                 for item in EXEMPTED_PARAMETER:
-                    if item in body_data: del body_data[item]
-            log.request_body = body_data
+                    if item in requestBody: del requestBody[item]
+            log.request_body = requestBody
             log.url = request.get_full_path()
             log.view_name = view
             log.done_by = username
