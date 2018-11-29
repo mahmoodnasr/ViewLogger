@@ -36,12 +36,17 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 #### Notes
 * To exempt urls add VIEWLOGGER_EXEMPTED_PATHS to your setting.py
 ```python
-VIEWLOGGER_EXEMPTED_PATHS=["/worker"]
+VIEWLOGGER_EXEMPTED_PATHS=["/worker",]
 ```   
 
 * To exempt views add VIEWLOGGER_EXEMPTED_VIEWS to your setting.py
 ```python
-VIEWLOGGER_EXEMPTED_VIEWS=["worker"]
+VIEWLOGGER_EXEMPTED_VIEWS=["worker",]
+```   
+
+* To exempt parameters add VIEWLOGGER_EXEMPTED_PARAMETER to your setting.py
+```python
+VIEWLOGGER_EXEMPTED_PARAMETER=["password",]
 ```   
 
 * ViewLogger by dafualt log all requests (GET and POST), add VIEWLOGGER_METHODS in your setting.py to log certain method , 

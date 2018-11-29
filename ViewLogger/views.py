@@ -38,8 +38,8 @@ def mainViewLogger(request):
             if done_on is not None:
                 args = (Q(done_on__lt=datetime.datetime(done_on.year, done_on.month, done_on.day + 1)),
                         Q(done_on__gte=datetime.datetime(done_on.year, done_on.month, done_on.day)),)
-            request.session['kwargs'] = kwargs
-            request.session['args'] = args
+            request.kwargs = kwargs
+            request.args = args
             res = fetchChanges(request)
             res['form'] = form
             if "export" in request.POST:
@@ -51,8 +51,8 @@ def mainViewLogger(request):
 
 
 def fetchChanges(request):
-    k = request.session['kwargs']
-    a = request.session['args']
+    k = request.kwargs
+    a = request.args
     changes = Log.objects.filter(*a, **k).order_by("-id")
     rows = []
     for change in changes:
