@@ -66,7 +66,6 @@ def fetchChanges(request):
         row['view_kwargs'] = change.view_kwargs
         # if 'csrfmiddlewaretoken' in change.request_body: del change.request_body['csrfmiddlewaretoken']
         reqBody = {}
-        print "request_body => ",change.request_body
         if change.request_body:
             for k in change.request_body:
                 if len(change.request_body[k]) > 0: reqBody[k] = change.request_body[k]

@@ -29,7 +29,7 @@ class ViewLoggerMiddleware(object):
                 requestBody = body_data
             method = request.method.upper()
             log.request_body = requestBody
-            log.url = request.get_full_path().split("?")[0] if method == "GET" else log.url = request.get_full_path()
+            log.url = request.get_full_path().split("?")[0] if method == "GET" else request.get_full_path()
             log.view_name = view
             log.done_by = username
             log.done_on = datetime.now()
