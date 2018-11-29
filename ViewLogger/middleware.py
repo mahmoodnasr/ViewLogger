@@ -17,11 +17,13 @@ class ViewLoggerMiddleware(object):
         EXEMPTED_PATHS = conf_settings.VIEWLOGGER_EXEMPTED_PATHS if hasattr(conf_settings, 'VIEWLOGGER_EXEMPTED_PATHS') else ("")
         if not path in EXEMPTED_PATHS and not view in EXEMPTED_VIEWS and request.method.lower() in VIEWLOGGER_METHODS:
             log = Log()
-            body_data._mutable = True
-            requestBody = body_data
+            requestBody = {}
             if EXEMPTED_PARAMETER:
-                for item in EXEMPTED_PARAMETER:
-                    if item in requestBody: del requestBody[item]
+                for item in body_data:
+                    if item not in EXEMPTED_PARAMETER:
+                        requestBody[item] = body_data[item]
+            else:
+                requestBody = body_data
             log.request_body = requestBody
             log.url = request.get_full_path()
             log.view_name = view
