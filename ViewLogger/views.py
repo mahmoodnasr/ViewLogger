@@ -64,10 +64,12 @@ def fetchChanges(request):
         row['url'] = change.url
         row['view_args'] = change.view_args
         row['view_kwargs'] = change.view_kwargs
-        if 'csrfmiddlewaretoken' in change.request_body: del change.request_body['csrfmiddlewaretoken']
+        # if 'csrfmiddlewaretoken' in change.request_body: del change.request_body['csrfmiddlewaretoken']
         reqBody = {}
-        for k in change.request_body:
-            if len(change.request_body[k]) > 0 : reqBody[k] = change.request_body[k]
+        print "request_body => ",change.request_body
+        if change.request_body:
+            for k in change.request_body:
+                if len(change.request_body[k]) > 0: reqBody[k] = change.request_body[k]
         row['request_body'] = reqBody
         row['request_method'] = change.request_method
         rows.append(row)

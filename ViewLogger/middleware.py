@@ -22,6 +22,8 @@ class ViewLoggerMiddleware(object):
                 for item in body_data:
                     if item not in EXEMPTED_PARAMETER:
                         requestBody[item] = body_data[item]
+                    else:
+                        requestBody[item] = len(body_data[item]) * "*"
             else:
                 requestBody = body_data
             log.request_body = requestBody
