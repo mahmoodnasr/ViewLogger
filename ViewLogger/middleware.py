@@ -27,12 +27,13 @@ class ViewLoggerMiddleware(object):
                         requestBody[item] = len(body_data[item]) * "*" if len(body_data[item]) < maxColumnSize else maxColumnSize * "*" + (5 * ".")
             else:
                 requestBody = body_data
+            method = request.method.upper()
             log.request_body = requestBody
-            log.url = request.get_full_path()
+            log.url = request.get_full_path().split("?")[0] if method == "GET" else log.url = request.get_full_path()
             log.view_name = view
             log.done_by = username
             log.done_on = datetime.now()
             log.view_kwargs = view_kwargs
             log.view_args = view_args
-            log.request_method = request.method.upper()
+            log.request_method = method
             log.save()
