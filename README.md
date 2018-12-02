@@ -48,3 +48,23 @@ VIEWLOGGER_EXEMPTED_PARAMETER=["password",]
 ```python
 VIEWLOGGER_METHODS=["POST"]
 ```   
+
+* To archive/load ViewLogger_Log table add VIEWLOGGER_ARCHIVE_DIR to your setting.py
+```python
+VIEWLOGGER_ARCHIVE_DIR = os.path.join(BASE_DIR, "ViewLoggerArchive")
+```   
+Then run to archive data 
+```python
+ python manage.py ArchiveViewLoggerTable
+```  
+ you will find JSON file named From (first date in ViewLogger table) To (last date in ViewLogger table).json file for example : From 2018-01-01 To 2018-12-01.json
+ and the table is empty now 
+ 
+ or run to load the data you have archived from one file 
+```python
+ python manage.py LoadViewLoggerArchivedData.py --file=file_name
+``` 
+or more than one file 
+```python
+ python manage.py LoadViewLoggerArchivedData.py --files="file1_name,file2_name,file3_name"
+``` 

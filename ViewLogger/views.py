@@ -44,52 +44,34 @@ def mainViewLogger(request):
             res['form'] = form
             if "export" in request.POST:
                 template = 'ViewLogger_Data.html'
-                return reportAsExcel(request, template, res['changes'])
+                return reportAsExcel(template, res['changes'])
             return render_to_response("mainLog.html", res, context_instance=RequestContext(request))
         else:
             print form.errors
 
 
 def fetchChanges(request):
+    from .api import fetchChangesAPI
     k = request.kwargs
     a = request.args
     changes = Log.objects.filter(*a, **k).order_by("-id")
-    rows = []
-    for change in changes:
-        row = {}
-        row["event_time"] = change.done_on
-        row["by"] = change.done_by
-        row["name"] = change.view_name
-        row["id"] = change.id
-        row['url'] = change.url
-        row['view_args'] = change.view_args
-        row['view_kwargs'] = change.view_kwargs
-        # if 'csrfmiddlewaretoken' in change.request_body: del change.request_body['csrfmiddlewaretoken']
-        reqBody = {}
-        if change.request_body:
-            for k in change.request_body:
-                if len(change.request_body[k]) > 0: reqBody[k] = change.request_body[k]
-        row['request_body'] = reqBody
-        row['request_method'] = change.request_method
-        rows.append(row)
-    count = len(rows)
-    res = {"count": count, "changes": rows}
-    return res
+    return fetchChangesAPI(changes)
 
 
-def reportAsExcel(request, temp, vars):
+def reportAsExcel(temp, vars):
     import csv
     response = HttpResponse(content_type='text/csv, application/octet-stream')
-    response["Content-Disposition"] = "attachment; filename='{}'".format(temp.replace(".html", ".xls"))
+    response["Content-Disposition"] = "attachment; filename='{}'".format(temp.replace(".html", ".csv"))
     writer = csv.writer(response, csv.excel)
     response.write(u'\ufeff'.encode('utf8'))  # BOM (optional...Excel needs it to open UTF-8 file properly)
     writer.writerow(['', '', '','ViewLogger Data'])
     writer.writerow(['', '', '', '', '', '', '', '',])
-    names = ['#', 'URL','View Args','View Kwargs','Request Method','Request Body','Done By','Done On']
+    names = ['#',"View Name", 'URL','View Args','View Kwargs','Request Method','Request Body','Done By','Done On']
     writer.writerow(names)
     for obj in vars:
         temp_list = []
         temp_list.append(obj['id'])
+        temp_list.append(obj['view_name'])
         temp_list.append(obj['url'])
         res = ""
         for k in obj['view_args']:res += k + "\n"
@@ -101,7 +83,7 @@ def reportAsExcel(request, temp, vars):
         res = ""
         for k, v in obj['request_body'].items():res+=k+" : "+v+"\n"
         temp_list.append(res)
-        temp_list.append(obj['name'])
-        temp_list.append(obj['event_time'])
+        temp_list.append(obj['done_by'])
+        temp_list.append(obj['done_on'])
         writer.writerow(temp_list)
     return response
