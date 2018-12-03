@@ -1,31 +1,16 @@
-from django.core.management.base import BaseCommand, CommandError
-from Registry.Common import *
-from django.utils import timezone
 import os
+from django.core.management.base import BaseCommand
 from django.conf import settings
-from django.db.models.base import ModelState
-import simplejson, datetime
+import simplejson
 
-
-class DateTimeJsonEncoder(simplejson.JSONEncoder):
-    DATE_FORMAT = "%Y-%m-%d"
-    TIME_FORMAT = "%H:%M:%S.%f"
-
-    def default(self, obj):
-        if isinstance(obj, datetime.datetime):
-            try:
-                return obj.strftime("%s %s" % (self.DATE_FORMAT, self.TIME_FORMAT))
-            except:
-                return None
-
-        return super(DateTimeJsonEncoder, self).default(obj)
 
 def validateURL(url):
-    dir = settings.VIEWLOGGER_ARCHIVE_DIR if hasattr(settings, 'VIEWLOGGER_ARCHIVE_DIR') else os.path.join(settings.BASE_DIR, "ViewLoggerArchive")
+    dir = settings.VIEWLOGGER_ARCHIVE_DIR if hasattr(settings, 'VIEWLOGGER_ARCHIVE_DIR') else os.path.join(
+        settings.BASE_DIR, "ViewLoggerArchive")
     finalURL = ""
     if '.' in url:
         if url.split(".")[-1] not in ["JSON", 'json', "Json"]:
-            return 0,"Please make sure to put the right file extension in ( %s )" % (url)
+            return 0, "Please make sure to put the right file extension in ( %s )" % (url)
         else:
             finalURL = url
     else:
@@ -33,9 +18,10 @@ def validateURL(url):
     dist = dir + "/%s" % (str(finalURL))
     exists = os.path.isfile(dist)
     if not exists:
-        return 0,"File is not exist. Please put it in VIEWLOGGER_ARCHIVE_DIR url you determined ."
+        return 0, "File is not exist. Please put it in VIEWLOGGER_ARCHIVE_DIR url you determined ."
     else:
-        return 1,dist
+        return 1, dist
+
 
 class Command(BaseCommand):
     help = '''
@@ -58,11 +44,12 @@ class Command(BaseCommand):
                 urlList.append(url)
         for url in urlList:
             valid, message = validateURL(url)
-            if not valid: return message
+            if not valid:
+                return message
             else:
                 with open(message) as f:
                     JSONFile.append(simplejson.load(f))
-        print "Files => ",len(JSONFile)
+        print "Files => ", len(JSONFile)
         for file in JSONFile:
             for records in file:
                 log = Log()
