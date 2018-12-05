@@ -37,11 +37,14 @@
     </div>
     <br/>
     <div class="row">
-        <div class="col-md-6" align="center">
+        <div class="col-md-4" align="center">
             <button type="submit" name="submit" class="btn btn-primary">Get History</button>
         </div>
+        <div class="col-md-4" align="center">
+            <a href="{% url 'search_in_archives' %}" class="btn btn-info">Search In Archives</a>
+        </div>
         {% if count and count > 0 %}
-            <div class="col-md-6">
+            <div class="col-md-4">
 {#            <a href='{% querystring '_export'='xls' %}' data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">#}
 {#            <img src="{{ STATIC_URL }}img/xls_icon.png" title="Export Report"/></a>#}
                 <button type="submit" name="export" class="btn btn-success">Export As Excel</button>
@@ -56,6 +59,7 @@
             <thead>
             <tr>
                 <th scope="col">#</th>
+                <th scope="col">View Name</th>
                 <th scope="col">Done By</th>
                 <th scope="col">Done On</th>
                 <th scope="col">URL</th>
@@ -70,6 +74,7 @@
             {% for change in changes %}
                 <tr>
                     <th scope="row">{{ change.id }}</th>
+                    <td>{{ change.view_name }}</td>
                     <td>{{ change.done_by }}</td>
                     <td>{{ change.done_on }}</td>
                     <td>{{ change.url }}</td>

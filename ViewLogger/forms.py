@@ -31,6 +31,8 @@ class ViewLogger_Form(forms.Form):
                                                          initial='',
                                                          required=False,
                                                          widget=forms.Select(attrs={"class": "form-control"}))
+        else:
+            self.fields['view_name'] = forms.CharField(label="View Name", required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
     class Meta:
         model = Log
         fields = ('view_name', 'request_method', 'url', 'done_by','done_on')

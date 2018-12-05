@@ -1,4 +1,4 @@
-def run(excuter):
+def run(excuter,Return=False):
     import subprocess
     PIPE = subprocess.PIPE
     p = subprocess.Popen(excuter, stdout=PIPE, stderr=PIPE, shell=True)
@@ -6,4 +6,7 @@ def run(excuter):
     while p.poll() is None:
         line = "".join(p.stdout.readlines())
         out += line
-    return out
+    if Return:
+        return out
+    else:
+        print out

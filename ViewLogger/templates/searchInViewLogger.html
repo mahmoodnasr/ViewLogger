@@ -1,0 +1,156 @@
+{#{% load render_table from django_tables2 %}#}
+{#{% load querystring from django_tables2 %}#}
+<html>
+<head>
+    <link href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <style>
+        #ViewLoggerTable ul {
+            list-style: none;
+            padding-left: 0;
+        }
+    </style>
+</head>
+<body class="container" style="width: 100%">
+<div style=""><h4 style="font-weight: bold;">View Logger</h4></div>
+<form action="{% url 'search_in_archives' %}" method="post">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-4 label-div"><label>{{ form.view_name.label }}</label></div>
+        <div class="col-md-8"><label>{{ form.view_name }}</label></div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 label-div"><label>{{ form.request_method.label }}</label></div>
+        <div class="col-md-8"><label>{{ form.request_method }}</label></div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 label-div"><label>{{ form.url.label }}</label></div>
+        <div class="col-md-8"><label>{{ form.url }}</label></div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 label-div"><label>{{ form.done_by.label }}</label></div>
+        <div class="col-md-8"><label>{{ form.done_by }}</label></div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 label-div"><label>{{ form.done_on.label }}</label></div>
+        <div class="col-md-8"><label>{{ form.done_on }}</label></div>
+    </div>
+    <br/>
+    <div class="row">
+        <div class="col-md-4" align="center">
+            <button type="submit" name="submit" class="btn btn-primary">Search</button>
+        </div>
+        <div class="col-md-4" align="center">
+            <a href="{% url 'LogMain' %}" class="btn btn-info">Back</a>
+        </div>
+{#        {% if count and count > 0 %}#}
+{#            <div class="col-md-4">#}
+{#                #}
+{#                <button type="submit" name="export" class="btn btn-success">Export As Excel</button>#}
+{#            </div>#}
+{#        {% endif %}#}
+    </div>
+
+</form>
+{% if count %}
+    {% if count == 0 %}
+        <div class="alert alert-danger">
+            No Record Found {{ id }}.
+        </div>
+    {% endif %}
+    {% for object in objects %}
+        <div class="alert alert-info">
+            File Name = {{ object.file }}
+        </div>
+        <div class="table-responsive-sm" id="ViewLoggerTable">
+            <table class="table table-hover table-bordered">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">View Name</th>
+                    <th scope="col">Done By</th>
+                    <th scope="col">Done On</th>
+                    <th scope="col">URL</th>
+                    <th scope="col">View Args</th>
+                    <th scope="col">View Kwargs</th>
+                    <th scope="col">Request Method</th>
+                    <th scope="col">Request Body</th>
+
+                </tr>
+                </thead>
+                <tbody>
+                {% for change in object.changes %}
+                    <tr>
+                        <th scope="row">
+                            <ul>
+                                {% for obj in change.id %}
+                                    <li>{{ obj }}</li>
+                                {% endfor %}
+                            </ul>
+                        </th>
+                        <td>
+                            <ul>
+                                {% for obj in change.view_name %}
+                                    <li>{{ obj }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                                {% for obj in change.done_by %}
+                                    <li>{{ obj }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                                {% for obj in change.done_on %}
+                                    <li>{{ obj }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                                {% for obj in change.url %}
+                                    <li>{{ obj }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                                {% for obj in change.view_args %}
+                                    <li>{{ obj }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                                {% for obj in change.view_kwargs %}
+                                    <li>{{ obj }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                                {% for obj in change.request_method %}
+                                    <li>{{ obj }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td style="width: 30%">
+                            <ul>
+                                {% for obj in change.request_body %}
+                                    <li>{{ obj }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endfor %}
+{% else %}
+{% endif %}
+</body>
+</html>
