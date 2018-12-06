@@ -43,12 +43,12 @@
         <div class="col-md-4" align="center">
             <a href="{% url 'LogMain' %}" class="btn btn-info">Back</a>
         </div>
-{#        {% if count and count > 0 %}#}
-{#            <div class="col-md-4">#}
-{#                #}
-{#                <button type="submit" name="export" class="btn btn-success">Export As Excel</button>#}
-{#            </div>#}
-{#        {% endif %}#}
+        {% if count and count > 0 %}
+            <div class="col-md-4">
+
+                <button type="submit" name="export" class="btn btn-success">Export As Excel</button>
+            </div>
+        {% endif %}
     </div>
 
 </form>

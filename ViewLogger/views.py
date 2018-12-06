@@ -64,7 +64,7 @@ def fetchChanges(request):
     return fetchChangesAPI(changes)
 
 
-def reportAsExcel(temp, vars):
+def reportAsExcel(temp, vars,seperated=False):
     import csv
     response = HttpResponse(content_type='text/csv, application/octet-stream')
     response["Content-Disposition"] = "attachment; filename='{}'".format(temp.replace(".html", ".csv"))
@@ -72,27 +72,46 @@ def reportAsExcel(temp, vars):
     response.write(u'\ufeff'.encode('utf8'))  # BOM (optional...Excel needs it to open UTF-8 file properly)
     writer.writerow(['', '', '', 'ViewLogger Data'])
     writer.writerow(['', '', '', '', '', '', '', '', ])
-    names = ['#', "View Name", 'URL', 'View Args', 'View Kwargs', 'Request Method', 'Request Body', 'Done By',
-             'Done On']
-    writer.writerow(names)
-    for obj in vars:
-        temp_list = []
-        temp_list.append(obj['id'])
-        temp_list.append(obj['view_name'])
-        temp_list.append(obj['url'])
-        res = ""
-        for k in obj['view_args']: res += k + "\n"
-        temp_list.append(res)
-        res = ""
-        for k, v in obj['view_kwargs'].items(): res += k + " : " + v + "\n"
-        temp_list.append(res)
-        temp_list.append(obj['request_method'])
-        res = ""
-        for k, v in obj['request_body'].items(): res += k + " : " + v + "\n"
-        temp_list.append(res)
-        temp_list.append(obj['done_by'])
-        temp_list.append(obj['done_on'])
-        writer.writerow(temp_list)
+    if seperated:
+        for object in vars:
+            file = object['file']
+            writer.writerow(['File Name = ',file,"",""])
+            names = ['#', "View Name", 'URL', 'View Args', 'View Kwargs', 'Request Method', 'Request Body', 'Done By','Done On']
+            writer.writerow(names)
+            for obj in object['changes']:
+                temp_list = []
+                temp_list.append("\n".join(obj['id']))
+                temp_list.append("\n".join(obj['view_name']))
+                temp_list.append("\n".join(obj['url']))
+                temp_list.append("\n".join(obj['view_args']))
+                temp_list.append("\n".join(obj['view_kwargs']))
+                temp_list.append("\n".join(obj['request_method']))
+                temp_list.append("\n".join(obj['request_body']))
+                temp_list.append("\n".join(obj['done_by']))
+                temp_list.append("\n".join(obj['done_by']))
+                writer.writerow(temp_list)
+    else:
+        names = ['#', "View Name", 'URL', 'View Args', 'View Kwargs', 'Request Method', 'Request Body', 'Done By',
+                 'Done On']
+        writer.writerow(names)
+        for obj in vars:
+            temp_list = []
+            temp_list.append(obj['id'])
+            temp_list.append(obj['view_name'])
+            temp_list.append(obj['url'])
+            res = ""
+            for k in obj['view_args']: res += k + "\n"
+            temp_list.append(res)
+            res = ""
+            for k, v in obj['view_kwargs'].items(): res += k + " : " + v + "\n"
+            temp_list.append(res)
+            temp_list.append(obj['request_method'])
+            res = ""
+            for k, v in obj['request_body'].items(): res += k + " : " + v + "\n"
+            temp_list.append(res)
+            temp_list.append(obj['done_by'])
+            temp_list.append(obj['done_on'])
+            writer.writerow(temp_list)
     return response
 
 
@@ -165,9 +184,9 @@ def search_in_archives(request):
             res["objects"] = objects
             res['count'] = len(objects)
             res['form'] = form
-            # if "export" in request.POST:
-            #     template = 'ViewLogger_Data.html'
-            #     return reportAsExcel(template, res['changes'])
+            if "export" in request.POST:
+                template = 'ViewLogger_Data.html'
+                return reportAsExcel(template, res["objects"],True)
             return render_to_response("searchInViewLogger.html", res, context_instance=RequestContext(request))
     if request.method == "GET":
         res["form"] = ViewLogger_Form()
