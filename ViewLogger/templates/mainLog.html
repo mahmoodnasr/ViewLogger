@@ -1,7 +1,6 @@
-{#{% load render_table from django_tables2 %}#}
-{#{% load querystring from django_tables2 %}#}
 <html>
 <head>
+    <title>ViewLogger</title>
     <link href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <style>
@@ -45,15 +44,19 @@
         </div>
         {% if count and count > 0 %}
             <div class="col-md-4">
-{#            <a href='{% querystring '_export'='xls' %}' data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">#}
-{#            <img src="{{ STATIC_URL }}img/xls_icon.png" title="Export Report"/></a>#}
                 <button type="submit" name="export" class="btn btn-success">Export As Excel</button>
             </div>
         {% endif %}
     </div>
 
 </form>
-{% if count > 0 %}
+{% if count %}
+    {% if count == 0 %}
+        <div class="alert alert-danger">
+            No Record Found {{ id }}.
+        </div>
+    {% endif %}
+
     <div class="table-responsive-sm" id="ViewLoggerTable">
         <table class="table table-hover table-bordered">
             <thead>
@@ -103,11 +106,7 @@
         </table>
     </div>
 
-
 {% else %}
-    <div class="alert alert-danger">
-        No Changes found for {{ id }}.
-    </div>
 {% endif %}
 </body>
 </html>

@@ -135,11 +135,12 @@ def stringToDic(obj):
     for li in lists:
         row = {}
         if li:
-            newLi , row['view_args'] = strSearch(li, r'(.*)"view_kwargs"', r'\[(.*?)\]')
+            newLi, viewargs = strSearch(li, r'(.*)"view_kwargs"', r'\[(.*?)\]')
+            row['view_args'] = viewargs[0].replace('"', '').split(",")
             newLi, viewkwargs = strSearch(newLi, r'(.*)"request_body"', r'\{(.*?)\}')
-            row['view_kwargs'] = viewkwargs[0].split(",")
+            row['view_kwargs'] = viewkwargs[0].replace('"', '').split(",")
             newLi, requestbody = strSearch(newLi, r'(.*)"url"', r'\{(.*?)\}')
-            row['request_body'] = requestbody[0].split(",")
+            row['request_body'] = requestbody[0].replace('"', '').split(",")
             newLi, row['url'] = strSearch(newLi, r'(.*)"done_on"', r': "(.*?)",')
             newLi, row['done_on'] = strSearch(newLi, r'(.*?)"view_name"', r': "(.*?)",')
             newLi, row['view_name'] = strSearch(newLi, r'(.*)"done_by"', r': "(.*?)",')

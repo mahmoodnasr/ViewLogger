@@ -1,13 +1,36 @@
-{#{% load render_table from django_tables2 %}#}
-{#{% load querystring from django_tables2 %}#}
 <html>
 <head>
+    <title>ViewLogger</title>
     <link href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <style>
         #ViewLoggerTable ul {
             list-style: none;
             padding-left: 0;
+        }
+
+        .collapsible {
+            background-color: #777;
+            color: white;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: none;
+            border-radius: 15px;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+
+        }
+
+        .active, .collapsible:hover {
+            background-color: #555;
+        }
+
+        .content {
+            padding: 0 18px;
+            display: none;
+            overflow: hidden;
         }
     </style>
 </head>
@@ -59,10 +82,9 @@
         </div>
     {% endif %}
     {% for object in objects %}
-        <div class="alert alert-info">
-            File Name = {{ object.file }}
-        </div>
-        <div class="table-responsive-sm" id="ViewLoggerTable">
+        <br/>
+        <button class="collapsible">File Name = {{ object.file }}</button>
+        <div class="content" id="ViewLoggerTable">
             <table class="table table-hover table-bordered">
                 <thead>
                 <tr>
@@ -149,8 +171,25 @@
                 </tbody>
             </table>
         </div>
+        <br/>
     {% endfor %}
 {% else %}
 {% endif %}
+<script>
+    var coll = document.getElementsByClassName("collapsible");
+    var i;
+
+    for (i = 0; i < coll.length; i++) {
+        coll[i].addEventListener("click", function () {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            if (content.style.display === "block") {
+                content.style.display = "none";
+            } else {
+                content.style.display = "block";
+            }
+        });
+    }
+</script>
 </body>
 </html>
