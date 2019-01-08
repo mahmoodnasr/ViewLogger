@@ -3,8 +3,7 @@ from django.template import RequestContext
 from django.core.context_processors import csrf
 import datetime
 from .forms import *
-# from .tables import *
-# from django_tables2.export.export import TableExport
+from django.db.models import Q
 from django.http import HttpResponse
 import os
 import commands
@@ -34,16 +33,22 @@ def mainViewLogger(request):
             request_method = form.cleaned_data.get('request_method')
             url = form.cleaned_data.get('url')
             done_by = form.cleaned_data.get('done_by')
-            done_on = form.cleaned_data.get('done_on', None)
+            done_on_from = form.cleaned_data.get('done_on_from', None)
+            done_on_to = form.cleaned_data.get('done_on_to', None)
+
             kwargs = {}
             args = []
             if view_name != '': kwargs['view_name'] = view_name
             if request_method != '': kwargs['request_method'] = request_method
             if url != '': kwargs['url__contains'] = url
             if done_by != '': kwargs['done_by'] = done_by
-            if done_on is not None:
-                args = (Q(done_on__lt=datetime.datetime(done_on.year, done_on.month, done_on.day + 1)),
-                        Q(done_on__gte=datetime.datetime(done_on.year, done_on.month, done_on.day)),)
+            if done_on_from and done_on_to:
+                kwargs['done_on__range'] = [done_on_from,datetime.datetime(done_on_to.year, done_on_to.month, done_on_to.day+1)]
+                # args = (Q(done_on__lte=done_on_to),Q(done_on__gte=done_on_from),)
+            elif done_on_from and not done_on_to:
+                args = (Q(done_on__gte=datetime.datetime(done_on_from.year, done_on_from.month, done_on_from.day)),)
+            elif done_on_to and not done_on_from:
+                args = (Q(done_on__lte=datetime.datetime(done_on_to.year, done_on_to.month, done_on_to.day)),)
             request.kwargs = kwargs
             request.args = args
             res = fetchChanges(request)
@@ -88,7 +93,7 @@ def reportAsExcel(temp, vars,seperated=False):
                 temp_list.append("\n".join(obj['request_method']))
                 temp_list.append("\n".join(obj['request_body']))
                 temp_list.append("\n".join(obj['done_by']))
-                temp_list.append("\n".join(obj['done_by']))
+                temp_list.append("\n".join(obj['done_on']))
                 writer.writerow(temp_list)
     else:
         names = ['#', "View Name", 'URL', 'View Args', 'View Kwargs', 'Request Method', 'Request Body', 'Done By',
@@ -162,21 +167,27 @@ def search_in_archives(request):
             request_method = form.cleaned_data.get('request_method',None)
             url = form.cleaned_data.get('url',None)
             done_by = form.cleaned_data.get('done_by',None)
-            done_on = form.cleaned_data.get('done_on', None)
+            done_on_from = form.cleaned_data.get('done_on_from', None)
+            done_on_to = form.cleaned_data.get('done_on_to', None)
             filesList = [x for x in os.listdir(dir)]
             alloptions = ""
             if url: alloptions += '''|  select(.url | contains("%s")) ''' % (url)
             if view_name: alloptions += '''|  select(.view_name | contains("%s")) ''' % (view_name)
             if done_by: alloptions += '''|  select(.done_by | contains("%s")) ''' % (done_by)
-            if done_on: alloptions += '''|  select(.done_on | contains("%s")) ''' % (done_on)
             if request_method: alloptions += '''|  select(.request_method | contains("%s")) ''' % (request_method)
+
+            if done_on_from and done_on_to:
+                alloptions += '''|  select((.done_on >= "%s") and (.done_on <= "%s"))''' % (str(done_on_from),str(done_on_to))
+            elif done_on_from and not done_on_to:
+                alloptions += '''|  select(.done_on >= "%s")''' % (str(done_on_from))
+            elif done_on_to and not done_on_from:
+                alloptions += '''|  select(.done_on <= "%s")''' % (str(done_on_to))
 
             bin = '%s/ViewLogger/bin/jq-linux64' % (settings.BASE_DIR)
             if not is_exe(bin):
                 stat, output = commands.getstatusoutput('chmod +x %s') % (bin)
             objects = []
             for file in filesList:
-                print "File = ", file
                 cmd = """%s/ViewLogger/bin/jq-linux64 '.[] %s' %s""" % (
                     settings.BASE_DIR, alloptions, dir + "/" + file)
                 com = Common.run(cmd,True).replace('\n','')

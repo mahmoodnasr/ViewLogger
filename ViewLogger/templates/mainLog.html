@@ -1,4 +1,4 @@
-<html>
+<html lang="en">
 <head>
     <title>ViewLogger</title>
     <link href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet">
@@ -8,6 +8,7 @@
             list-style: none;
             padding-left: 0;
         }
+
     </style>
 </head>
 <body class="container" style="width: 100%">
@@ -16,24 +17,30 @@
     {% csrf_token %}
     <div class="row">
         <div class="col-md-4 label-div"><label>{{ form.view_name.label }}</label></div>
-        <div class="col-md-8"><label>{{ form.view_name }}</label></div>
+        <div class="col-md-4">{{ form.view_name }}</div>
     </div>
+<br/>
     <div class="row">
         <div class="col-md-4 label-div"><label>{{ form.request_method.label }}</label></div>
-        <div class="col-md-8"><label>{{ form.request_method }}</label></div>
+        <div class="col-md-4">{{ form.request_method }}</div>
     </div>
+<br/>
     <div class="row">
         <div class="col-md-4 label-div"><label>{{ form.url.label }}</label></div>
-        <div class="col-md-8"><label>{{ form.url }}</label></div>
+        <div class="col-md-4">{{ form.url }}</div>
     </div>
+<br/>
     <div class="row">
         <div class="col-md-4 label-div"><label>{{ form.done_by.label }}</label></div>
-        <div class="col-md-8"><label>{{ form.done_by }}</label></div>
+        <div class="col-md-4">{{ form.done_by }}</div>
     </div>
+<br/>
     <div class="row">
-        <div class="col-md-4 label-div"><label>{{ form.done_on.label }}</label></div>
-        <div class="col-md-8"><label>{{ form.done_on }}</label></div>
+        <div class="col-md-4 label-div"><label>Done On</label></div>
+        <div class="col-md-2" id="done_on_from" title="From">{{ form.done_on_from}}</div>
+        <div class="col-md-2" id="done_on_to" title="To">{{ form.done_on_to}}</div>
     </div>
+<br/>
     <br/>
     <div class="row">
         <div class="col-md-4" align="center">

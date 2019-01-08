@@ -32,7 +32,7 @@ class Command(BaseCommand):
         if options['url']: alloptions += '''|  select(.url | contains("%s")) ''' % (options['url'])
         if options['view_name']: alloptions += '''|  select(.view_name | contains("%s")) ''' % (options['view_name'])
         if options['done_by']: alloptions += '''|  select(.done_by | contains("%s")) ''' % (options['done_by'])
-        if options['done_on']: alloptions += '''|  select(.done_on | contains("%s")) ''' % (options['done_on'])
+        if options['done_on']: alloptions += '''|  select(.done_on | startswith("%s")) ''' % (options['done_on'])
         if options['view_kwargs']:
             for option in options['view_kwargs'].split(","):
                 key = option.split("=")[0]

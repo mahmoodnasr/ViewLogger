@@ -1,7 +1,5 @@
 from django.forms import *
-from django.db.models import Q
 from django import forms
-from django.forms import extras, Widget
 from .models import *
 
 VIEWLOGGER_REQUEST_TYPE = (('', "Select"), ("POST", "POST"), ("GET", "GET"))
@@ -16,10 +14,14 @@ class ViewLogger_Form(forms.Form):
     url = forms.CharField(label="URL", required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
     done_by = forms.CharField(label="Done By", required=False,
                               widget=forms.TextInput(attrs={'class': "form-control"}))
-    done_on = forms.DateTimeField(label="Done On",
+    done_on_from = forms.DateTimeField(label="Done On",
                                   widget=forms.widgets.DateInput(
                                       attrs={'class': 'form-control datePicker', 'type': 'date'}),
                                   required=False)
+    done_on_to = forms.DateTimeField(label="To",
+                                       widget=forms.widgets.DateInput(
+                                           attrs={'class': 'form-control datePicker', 'type': 'date'}),
+                                       required=False)
 
     def __init__(self, *args, **kwargs):
         views = kwargs.pop('views',None)
@@ -35,4 +37,4 @@ class ViewLogger_Form(forms.Form):
             self.fields['view_name'] = forms.CharField(label="View Name", required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
     class Meta:
         model = Log
-        fields = ('view_name', 'request_method', 'url', 'done_by','done_on')
+        fields = ('view_name', 'request_method', 'url', 'done_by','done_on_from','done_on_to')
