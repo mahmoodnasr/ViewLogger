@@ -18,12 +18,6 @@ def mainViewLogger(request):
     views = [(s['view_name'], s['view_name']) for s in Log.objects.values("view_name").distinct().order_by("view_name")]
     if request.method == "GET":
         res["form"] = ViewLogger_Form(views=views)
-        # export_format = request.GET.get('_export', None)
-        # if export_format and TableExport.is_valid_format(export_format):
-        #     data = fetchChanges(request)
-        #     table = ViewLoggor_Data(data['changes'])
-        #     exporter = TableExport(export_format, table)
-        #     return exporter.response('ViewLogger_Data.%s' % (export_format))
         res.update(csrf(request))
         return render_to_response("mainLog.html", res, context_instance=RequestContext(request))
     if request.method == "POST":
@@ -44,7 +38,6 @@ def mainViewLogger(request):
             if done_by != '': kwargs['done_by'] = done_by
             if done_on_from and done_on_to:
                 kwargs['done_on__range'] = [done_on_from,datetime.datetime(done_on_to.year, done_on_to.month, done_on_to.day+1)]
-                # args = (Q(done_on__lte=done_on_to),Q(done_on__gte=done_on_from),)
             elif done_on_from and not done_on_to:
                 args = (Q(done_on__gte=datetime.datetime(done_on_from.year, done_on_from.month, done_on_from.day)),)
             elif done_on_to and not done_on_from:

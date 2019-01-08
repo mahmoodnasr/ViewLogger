@@ -5,10 +5,12 @@ import simplejson, datetime
 from django.db import connection
 
 
-def RESET_AUTO_INCREMENT():
+def RESET(days,lastID):
     with connection.cursor() as cursor:
-        cursor.execute("TRUNCATE TABLE ViewLogger_log;")
-        cursor.execute("ALTER TABLE ViewLogger_log AUTO_INCREMENT = 1;")
+        query = "DELETE FROM ViewLogger_log WHERE done_on < "+days
+        cursor.execute(query)
+        resetQ = 'ALTER TABLE ViewLogger_log AUTO_INCREMENT = '+str(lastID)
+        cursor.execute(resetQ)
         row = cursor.fetchone()
     return row
 
@@ -28,29 +30,36 @@ class DateTimeJsonEncoder(simplejson.JSONEncoder):
 
 
 class Command(BaseCommand):
-    help = 'Archive ViewLogger_log table data and empty its content'
+    help = 'Archive ViewLogger_log table data and empty its content in days ' \
+           'Example : "python manage.py ArchiveViewLoggerTable --before=7"' \
+           'This command will archive the data exist in table except the past 7 days'
 
     def add_arguments(self, parser):
-        pass
+        parser.add_argument('--before', nargs='?', type=int, default=7)
 
     def handle(self, *args, **options):
         from ViewLogger.models import Log
         from ViewLogger.api import fetchChangesAPI
-        changes = Log.objects.all().order_by('id')
-        first = changes.values_list("done_on", flat=True)[0].date()
-        last = changes.values_list("done_on", flat=True).last().date()
-        res = fetchChangesAPI(changes)
-        json = res["changes"]
-        dir = settings.VIEWLOGGER_ARCHIVE_DIR if hasattr(settings, 'VIEWLOGGER_ARCHIVE_DIR') else os.path.join(
-            settings.BASE_DIR, "ViewLoggerArchive")
-        if not os.path.exists(dir):
-            os.makedirs(dir)
-        dist = dir + "/From_%s_To_%s.json" % (str(first), str(last))
-        if os.path.exists(dist):
-            dist.replace(".json","_1")
-        f = open(dist, "w")
-        f.write(simplejson.dumps(json, cls=DateTimeJsonEncoder))
-        f.close()
-        changes.delete()
-        print RESET_AUTO_INCREMENT()
-        print "Done"
+        days = (datetime.datetime.now() - datetime.timedelta(days=options["before"])).strftime('%Y-%m-%d')
+        changes = Log.objects.filter(done_on__lt=days).order_by('id')
+        count = len(changes)
+        if changes.exists():
+            lastID = changes[0].id
+            first = changes.values_list("done_on", flat=True)[0].date()
+            last = changes.values_list("done_on", flat=True).last().date()
+            res = fetchChangesAPI(changes)
+            json = res["changes"]
+            dir = settings.VIEWLOGGER_ARCHIVE_DIR if hasattr(settings, 'VIEWLOGGER_ARCHIVE_DIR') else os.path.join(
+                settings.BASE_DIR, "ViewLoggerArchive")
+            if not os.path.exists(dir):
+                os.makedirs(dir)
+            date = datetime.datetime.now()
+            dist = dir + "/From_%s_To_%s(%s).json" % (str(first), str(last),str(date)[11:19])
+            f = open(dist, "w")
+            f.write(simplejson.dumps(json, cls=DateTimeJsonEncoder))
+            f.close()
+            changes.delete()
+            print RESET(days,lastID)
+            print "Done - %s Records"%count
+        else:
+            return "There are no records"
