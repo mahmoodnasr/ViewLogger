@@ -45,7 +45,7 @@ def mainViewLogger(request):
             if url != '': kwargs['url__contains'] = url
             if done_by != '': kwargs['done_by'] = done_by
             if done_on_from and done_on_to:
-                kwargs['done_on__range'] = [done_on_from,datetime.datetime(done_on_to.year, done_on_to.month, done_on_to.day+1)]
+                kwargs['done_on__range'] = [done_on_from,datetime.datetime(done_on_to.year, done_on_to.month, done_on_to.day)+datetime.timedelta(days=1)]
             elif done_on_from and not done_on_to:
                 args = (Q(done_on__gte=datetime.datetime(done_on_from.year, done_on_from.month, done_on_from.day)),)
             elif done_on_to and not done_on_from:
@@ -74,7 +74,7 @@ def reportAsExcel(temp, vars,seperated=False):
     import unicodecsv as csv
     response = HttpResponse(content_type='text/csv, application/octet-stream')
     response["Content-Disposition"] = "attachment; filename={}".format(temp.replace(".html", ".csv"))
-    writer = csv.writer(response ,encoding='utf-8')
+    writer = csv.writer(response ,encoding='utf-8',quotechar='"')
     writer.writerow(['', '', '', 'ViewLogger Data'])
     writer.writerow(['', '', '', '', '', '', '', '', ])
     if seperated:
@@ -105,16 +105,16 @@ def reportAsExcel(temp, vars,seperated=False):
             temp_list.append(obj['view_name'])
             temp_list.append(obj['url'])
             res = ""
-            for k in obj['view_args']: res += k + "\n"
+            for k in obj['view_args']: res += k.encode('utf8') + "\n".encode('utf8')
             temp_list.append(res)
             res = ""
             if type(obj['view_kwargs']) == type({}):
-                for k, v in obj['view_kwargs'].items(): res += k + " : " + v + "\n"
+                for k, v in obj['view_kwargs'].items(): res += k.encode('utf8') + " : " + v.encode('utf8') + "\n".encode('utf8')
             temp_list.append(res)
             temp_list.append(obj['request_method'])
             res = ""
             if type(obj['request_body']) == type({}):
-                for k, v in obj['request_body'].items(): res += k + " : " + v + "\n"
+                for k, v in obj['request_body'].items():res += k.encode('utf8') + " : " + v.encode('utf8') + "\n".encode('utf8')
             temp_list.append(res)
             temp_list.append(obj['done_by'])
             temp_list.append(obj['done_on'])
