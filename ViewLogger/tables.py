@@ -15,8 +15,9 @@ class ViewLoggor_Data(tables.Table):
 
     def render_request_body(self, value, record):
         res = ""
-        for k, v in record['request_body'].items():
-            res += k + " : " + v + "\n"
+        if type(record['request_body']) == type({}):
+            for k, v in record['request_body'].items():
+                res += k + " : " + v + "\n"
         return mark_safe(res)
 
     def render_view_args(self, value, record):
@@ -27,8 +28,9 @@ class ViewLoggor_Data(tables.Table):
 
     def render_view_kwargs(self, value, record):
         res = ""
-        for k, v in record['view_kwargs'].items():
-            res += k + " : " + v + "\n"
+        if type(record['view_kwargs']) == type({}):
+            for k, v in record['view_kwargs'].items():
+                res += k + " : " + v + "\n"
         return mark_safe(res)
 
     class Meta:

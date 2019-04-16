@@ -1,16 +1,24 @@
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.core.context_processors import csrf
+try:
+    from django.core.context_processors import csrf
+except:
+    from django.template.context_processors import csrf
 import datetime
 from .forms import *
 from django.db.models import Q
+from django.shortcuts import render
 from django.http import HttpResponse
 import os
-import commands
+try:
+    import commands
+except:
+    import subprocess
 from django.conf import settings
-from ViewLogger import Common
+from . import Common
 import json
 import re
+import sys
 
 
 def mainViewLogger(request):
@@ -19,7 +27,7 @@ def mainViewLogger(request):
     if request.method == "GET":
         res["form"] = ViewLogger_Form(views=views)
         res.update(csrf(request))
-        return render_to_response("mainLog.html", res, context_instance=RequestContext(request))
+        return render(request,"mainLog.html", res)
     if request.method == "POST":
         form = ViewLogger_Form(request.POST, views=views)
         if form.is_valid():
@@ -49,9 +57,9 @@ def mainViewLogger(request):
             if "export" in request.POST:
                 template = 'ViewLogger_Data.html'
                 return reportAsExcel(template, res['changes'])
-            return render_to_response("mainLog.html", res, context_instance=RequestContext(request))
+            return render(request,"mainLog.html", res)
         else:
-            print form.errors
+            print(form.errors)
 
 
 def fetchChanges(request):
@@ -63,11 +71,10 @@ def fetchChanges(request):
 
 
 def reportAsExcel(temp, vars,seperated=False):
-    import csv
+    import unicodecsv as csv
     response = HttpResponse(content_type='text/csv, application/octet-stream')
-    response["Content-Disposition"] = "attachment; filename='{}'".format(temp.replace(".html", ".csv"))
-    writer = csv.writer(response, csv.excel)
-    response.write(u'\ufeff'.encode('utf8'))  # BOM (optional...Excel needs it to open UTF-8 file properly)
+    response["Content-Disposition"] = "attachment; filename={}".format(temp.replace(".html", ".csv"))
+    writer = csv.writer(response ,encoding='utf-8')
     writer.writerow(['', '', '', 'ViewLogger Data'])
     writer.writerow(['', '', '', '', '', '', '', '', ])
     if seperated:
@@ -101,11 +108,13 @@ def reportAsExcel(temp, vars,seperated=False):
             for k in obj['view_args']: res += k + "\n"
             temp_list.append(res)
             res = ""
-            for k, v in obj['view_kwargs'].items(): res += k + " : " + v + "\n"
+            if type(obj['view_kwargs']) == type({}):
+                for k, v in obj['view_kwargs'].items(): res += k + " : " + v + "\n"
             temp_list.append(res)
             temp_list.append(obj['request_method'])
             res = ""
-            for k, v in obj['request_body'].items(): res += k + " : " + v + "\n"
+            if type(obj['request_body']) == type({}):
+                for k, v in obj['request_body'].items(): res += k + " : " + v + "\n"
             temp_list.append(res)
             temp_list.append(obj['done_by'])
             temp_list.append(obj['done_on'])
@@ -178,7 +187,10 @@ def search_in_archives(request):
 
             bin = '%s/ViewLogger/bin/jq-linux64' % (settings.BASE_DIR)
             if not is_exe(bin):
-                stat, output = commands.getstatusoutput('chmod +x %s') % (bin)
+                if sys.version_info >= (3, 0, 0):
+                    stat, output = subprocess.getstatusoutput('chmod +x ' + bin)
+                else:
+                    stat, output = commands.getstatusoutput('chmod +x %s') % (bin)
             objects = []
             for file in filesList:
                 cmd = """%s/ViewLogger/bin/jq-linux64 '.[] %s' %s""" % (
@@ -192,8 +204,8 @@ def search_in_archives(request):
             if "export" in request.POST:
                 template = 'ViewLogger_Data.html'
                 return reportAsExcel(template, res["objects"],True)
-            return render_to_response("searchInViewLogger.html", res, context_instance=RequestContext(request))
+            return render(request,"searchInViewLogger.html", res)
     if request.method == "GET":
         res["form"] = ViewLogger_Form()
         res.update(csrf(request))
-        return render_to_response("searchInViewLogger.html", res, context_instance=RequestContext(request))
+        return render(request,"searchInViewLogger.html", res)

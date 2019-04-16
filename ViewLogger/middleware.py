@@ -1,15 +1,23 @@
 from datetime import datetime
-from ViewLogger.models import Log
+from .models import Log
 from django.conf import settings as conf_settings
+import sys
+Object = object
+if sys.version_info >= (3,0,0):
+    from django.utils.deprecation import MiddlewareMixin
+    Object = MiddlewareMixin
 
-
-class ViewLoggerMiddleware(object):
+class ViewLoggerMiddleware(Object):
 
     def process_view(self, request, view_func, view_args, view_kwargs):
         maxColumnSize = 10
         username = request.user.username if request.user else "None"
         body_data = request.GET if request.method == 'GET' else request.POST
-        view = view_func.func_name
+        try:
+            view = view_func.func_name
+        except:
+            view = view_func.__name__
+        view = view_func.__name__
         path = request.META["PATH_INFO"]
 
         VIEWLOGGER_METHODS = [i.lower() for i in conf_settings.VIEWLOGGER_METHODS] if  hasattr(conf_settings, "VIEWLOGGER_METHODS") else ['post','get']

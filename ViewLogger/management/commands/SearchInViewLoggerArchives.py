@@ -1,5 +1,8 @@
 import os
-import commands
+try:
+    import commands
+except:
+    import subprocess
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from ViewLogger import Common
@@ -52,12 +55,15 @@ class Command(BaseCommand):
                 val = option.split("=")[-1]
                 if key != "":
                     alloptions+=""" | select(.request_body.%s = "%s") """%(key,val)
-        bin = '%s/ViewLogger/bin/jq-linux64' % (settings.BASE_DIR)
+        bin = settings.BASE_DIR + '/ViewLogger/bin/jq-linux64'
         if not is_exe(bin):
-            stat, output = commands.getstatusoutput('chmod +x %s') % (bin)
+            try:
+                stat, output = commands.getstatusoutput('chmod +x '+bin)
+            except:
+                stat, output = subprocess.getstatusoutput('chmod +x '+bin)
 
         for file in filesList:
-            print "File = ",file
+            print("File = ",file)
             cmd = """%s/ViewLogger/bin/jq-linux64 '.[] %s' %s""" % (
                 settings.BASE_DIR, alloptions, dir + "/" + file)
-            print Common.run(cmd)
+            print(Common.run(cmd))

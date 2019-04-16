@@ -59,7 +59,7 @@ class Command(BaseCommand):
             f.write(simplejson.dumps(json, cls=DateTimeJsonEncoder))
             f.close()
             changes.delete()
-            print RESET(days,lastID)
-            print "Done - %s Records"%count
+            print(RESET(days,lastID))
+            print("Done - %s Records"%count)
         else:
             return "There are no records"

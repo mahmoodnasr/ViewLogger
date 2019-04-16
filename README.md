@@ -7,6 +7,7 @@ ViewLogger is a simple Django app Log view hits over time so that you know who e
 * Install the package
 ```sh
 pip install ViewLogger
+pip install unicodecsv
 ```
 * Add Application to your project's INSTALLED_APPs
 ```python

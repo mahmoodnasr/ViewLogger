@@ -49,7 +49,7 @@ class Command(BaseCommand):
             else:
                 with open(message) as f:
                     JSONFile.append(simplejson.load(f))
-        print "Files => ", len(JSONFile)
+        print("Files => ", len(JSONFile))
         for file in JSONFile:
             for records in file:
                 log = Log()
@@ -62,4 +62,4 @@ class Command(BaseCommand):
                 log.view_args = records["view_args"]
                 log.request_method = records["request_method"]
                 log.save()
-        print "Done"
+        print ("Done")
