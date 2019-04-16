@@ -105,16 +105,20 @@ def reportAsExcel(temp, vars,seperated=False):
             temp_list.append(obj['view_name'])
             temp_list.append(obj['url'])
             res = ""
-            for k in obj['view_args']: res += k.encode('utf8') + "\n".encode('utf8')
+            for k in obj['view_args']: res += k.encode('utf8') + "\r\n".encode('utf8')
             temp_list.append(res)
             res = ""
             if type(obj['view_kwargs']) == type({}):
-                for k, v in obj['view_kwargs'].items(): res += k.encode('utf8') + " : " + v.encode('utf8') + "\n".encode('utf8')
+                for k, v in obj['view_kwargs'].items():
+                    if k not in [None,""]:
+                        res += k.encode('utf8') + " : " + v.encode('utf8') + "\r\n".encode('utf8')
             temp_list.append(res)
             temp_list.append(obj['request_method'])
             res = ""
             if type(obj['request_body']) == type({}):
-                for k, v in obj['request_body'].items():res += k.encode('utf8') + " : " + v.encode('utf8') + "\n".encode('utf8')
+                for k, v in obj['request_body'].items():
+                    if k not in [None,""]:
+                        res += k.encode('utf8') + " : " + v.encode('utf8') + "\r\n".encode('utf8')
             temp_list.append(res)
             temp_list.append(obj['done_by'])
             temp_list.append(obj['done_on'])
