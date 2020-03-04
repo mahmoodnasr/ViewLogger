@@ -14,6 +14,7 @@ setup(
     license='MIT',
     description='Log view hits over time so that you know who enter this view and when.',
     long_description=README,
+    long_description_content_type="text/markdown",
     url='https://github.com/mahmoodnasr/ViewLogger/',
     author='Mahmood Nasr',
     author_email='mahmood.nasr.fcis@gmail.com',
