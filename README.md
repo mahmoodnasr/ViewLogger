@@ -15,7 +15,7 @@ INSTALLED_APPS = (
     '....',
     'ViewLogger',
     )
-```    
+```      
 * Add `ViewLogger.middleware.ViewLoggerMiddleware` to your Middleware classes .
 ```python
 MIDDLEWARE_CLASSES = (
@@ -23,6 +23,14 @@ MIDDLEWARE_CLASSES = (
     'ViewLogger.middleware.ViewLoggerMiddleware',
     )
 ```   
+* Add url to your project's urlpatterns
+```python
+urlpatterns = (
+    '....',
+    url(r'^view_log/', include('ViewLogger.urls')),
+    )
+```  
+
 
 * Run Migrations
 ```sh
@@ -30,6 +38,8 @@ MIDDLEWARE_CLASSES = (
 ```
 
 #### Notes
+* For better user experience please use [chosen](https://harvesthq.github.io/chosen/)
+
 * To exempt urls add VIEWLOGGER_EXEMPTED_PATHS to your setting.py
 ```python
 VIEWLOGGER_EXEMPTED_PATHS=["/worker",]

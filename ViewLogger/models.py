@@ -15,3 +15,5 @@ class Log(models.Model):
 
     def __unicode__(self):
         return self.id
+    class Meta:
+        app_label = "ViewLogger"

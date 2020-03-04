@@ -2,119 +2,126 @@
 <html lang="en">
 <head>
     <title>ViewLogger</title>
+    <script src="{% static "js/jquery-1.11.min.js" %}"></script>
+    <script src="{% static 'js/chosen.jquery.min.js' %}"></script>
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <link href="{% static "css/chosen.min.css" %}" rel="stylesheet"/>
+    <script type="text/javaScript">
+        $(document).ready(function () {
+            $("#id_view_name").chosen("id_view_name");
+            $("#id_request_method").chosen("id_request_method");
+        });
+    </script>
     <style>
         #ViewLoggerTable ul {
             list-style: none;
             padding-left: 0;
         }
-
     </style>
 </head>
 <body class="container" style="width: 100%">
-<div style=""><h4 style="font-weight: bold;">View Logger</h4></div>
-<form action="{% url 'LogMain' %}" method="post">
-    {% csrf_token %}
-    <div class="row">
-        <div class="col-md-4 label-div"><label>{{ form.view_name.label }}</label></div>
-        <div class="col-md-4">{{ form.view_name }}</div>
-    </div>
-<br/>
-    <div class="row">
-        <div class="col-md-4 label-div"><label>{{ form.request_method.label }}</label></div>
-        <div class="col-md-4">{{ form.request_method }}</div>
-    </div>
-<br/>
-    <div class="row">
-        <div class="col-md-4 label-div"><label>{{ form.url.label }}</label></div>
-        <div class="col-md-4">{{ form.url }}</div>
-    </div>
-<br/>
-    <div class="row">
-        <div class="col-md-4 label-div"><label>{{ form.done_by.label }}</label></div>
-        <div class="col-md-4">{{ form.done_by }}</div>
-    </div>
-<br/>
-    <div class="row">
-        <div class="col-md-4 label-div"><label>Done On</label></div>
-        <div class="col-md-2" id="done_on_from" title="From">{{ form.done_on_from}}</div>
-        <div class="col-md-2" id="done_on_to" title="To">{{ form.done_on_to}}</div>
-    </div>
-<br/>
-    <br/>
-    <div class="row">
-        <div class="col-md-4" align="center">
-            <button type="submit" name="submit" class="btn btn-primary">Get History</button>
+    <div style=""><h4 style="font-weight: bold;">View Logger</h4><br/></div>
+    <form action="{% url 'LogMain' %}" method="post">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-4 label-div"><label>{{ form.view_name.label }}</label></div>
+            <div class="col-md-4">{{ form.view_name }}</div>
         </div>
-        <div class="col-md-4" align="center">
-            <a href="{% url 'search_in_archives' %}" class="btn btn-info">Search In Archives</a>
+        <br/>
+        <div class="row">
+            <div class="col-md-4 label-div"><label>{{ form.request_method.label }}</label></div>
+            <div class="col-md-4">{{ form.request_method }}</div>
         </div>
-        {% if count and count > 0 %}
-            <div class="col-md-4">
-                <button type="submit" name="export" class="btn btn-success">Export As Excel</button>
+        <br/>
+        <div class="row">
+            <div class="col-md-4 label-div"><label>{{ form.url.label }}</label></div>
+            <div class="col-md-4">{{ form.url }}</div>
+        </div>
+        <br/>
+        <div class="row">
+            <div class="col-md-4 label-div"><label>{{ form.done_by.label }}</label></div>
+            <div class="col-md-4">{{ form.done_by }}</div>
+        </div>
+        <br/>
+        <div class="row">
+            <div class="col-md-4 label-div"><label>Done On</label></div>
+            <div class="col-md-2" id="done_on_from" title="From">{{ form.done_on_from }}</div>
+            <div class="col-md-2" id="done_on_to" title="To">{{ form.done_on_to }}</div>
+        </div>
+        <br/>
+        <br/>
+        <div class="row">
+            <div class="col-md-4" align="center">
+                <button type="submit" name="submit" class="btn btn-primary">Get History</button>
+            </div>
+            <div class="col-md-4" align="center">
+                <a href="{% url 'search_in_archives' %}" class="btn btn-info">Search In Archives</a>
+            </div>
+            {% if count and count > 0 %}
+                <div class="col-md-4">
+                    <button type="submit" name="export" class="btn btn-success">Export As Excel</button>
+                </div>
+            {% endif %}
+        </div>
+
+    </form>
+    {% if count %}
+        {% if count == 0 %}
+            <div class="alert alert-danger">
+                No Record Found {{ id }}.
             </div>
         {% endif %}
-    </div>
 
-</form>
-{% if count %}
-    {% if count == 0 %}
-        <div class="alert alert-danger">
-            No Record Found {{ id }}.
-        </div>
-    {% endif %}
-
-    <div class="table-responsive-sm" id="ViewLoggerTable">
-        <table class="table table-hover table-bordered">
-            <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">View Name</th>
-                <th scope="col">Done By</th>
-                <th scope="col">Done On</th>
-                <th scope="col">URL</th>
-                <th scope="col">View Args</th>
-                <th scope="col">View Kwargs</th>
-                <th scope="col">Request Method</th>
-                <th scope="col">Request Body</th>
-
-            </tr>
-            </thead>
-            <tbody>
-            {% for change in changes %}
+        <div class="table-responsive-sm" id="ViewLoggerTable">
+            <table class="table table-hover table-bordered">
+                <thead>
                 <tr>
-                    <th scope="row">{{ change.id }}</th>
-                    <td>{{ change.view_name }}</td>
-                    <td>{{ change.done_by }}</td>
-                    <td>{{ change.done_on }}</td>
-                    <td>{{ change.url }}</td>
-                    <td>
-                        <ul>
-                            {% for k,v in change.view_args.items %}
-                                <li>{{ k }} : {{ v }}</li>{% endfor %}
-                        </ul>
-                    </td>
-                    <td>
-                        <ul>
-                            {% for k,v in change.view_kwargs.items %}
-                                <li>{{ k }} : {{ v }}</li>{% endfor %}
-                        </ul>
-                    </td>
-                    <td>{{ change.request_method }}</td>
-                    <td style="width: 30%">
-                        <ul>
-                            {% for k,v in change.request_body.items %}
-                                <li>{{ k }} : {{ v }}</li>{% endfor %}
-                        </ul>
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                    <th scope="col">#</th>
+                    <th scope="col">View Name</th>
+                    <th scope="col">Done By</th>
+                    <th scope="col">Done On</th>
+                    <th scope="col">URL</th>
+                    <th scope="col">View Args</th>
+                    <th scope="col">View Kwargs</th>
+                    <th scope="col">Request Method</th>
+                    <th scope="col">Request Body</th>
 
-{% else %}
-{% endif %}
+                </tr>
+                </thead>
+                <tbody>
+                {% for change in changes %}
+                    <tr>
+                        <th scope="row">{{ change.id }}</th>
+                        <td>{{ change.view_name }}</td>
+                        <td>{{ change.done_by }}</td>
+                        <td>{{ change.done_on }}</td>
+                        <td>{{ change.url }}</td>
+                        <td>
+                            <ul>
+                                {% for k,v in change.view_args.items %}
+                                    <li>{{ k }} : {{ v }}</li>{% endfor %}
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                                {% for k,v in change.view_kwargs.items %}
+                                    <li>{{ k }} : {{ v }}</li>{% endfor %}
+                            </ul>
+                        </td>
+                        <td>{{ change.request_method }}</td>
+                        <td style="width: 30%">
+                            <ul>
+                                {% for k,v in change.request_body.items %}
+                                    <li>{{ k }} : {{ v }}</li>{% endfor %}
+                            </ul>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    {% else %}
+    {% endif %}
 </body>
 </html>
