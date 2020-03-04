@@ -38,7 +38,7 @@ urlpatterns = (
 ```
 
 #### Notes
-* For better user experience please use [chosen](https://harvesthq.github.io/chosen/)
+* For better user experience please use https://harvesthq.github.io/chosen/
 
 * To exempt urls add VIEWLOGGER_EXEMPTED_PATHS to your setting.py
 ```python
