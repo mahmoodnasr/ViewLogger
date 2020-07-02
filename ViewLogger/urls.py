@@ -1,8 +1,8 @@
+from django.urls import path as url
 from . import views
-from django.conf.urls import url
 
 
 urlpatterns = [
-    url('^$', views.mainViewLogger, name="LogMain"),
-    url('^search$', views.search_in_archives, name="search_in_archives"),
+    url('', views.mainViewLogger, name="LogMain"),
+    url('search/', views.search_in_archives, name="search_in_archives"),
 ]
