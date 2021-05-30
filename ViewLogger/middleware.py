@@ -1,3 +1,4 @@
+import time
 from datetime import datetime
 from .models import Log
 from django.conf import settings as conf_settings
@@ -19,11 +20,13 @@ class ViewLoggerMiddleware(Object):
             view = view_func.__name__
         view = view_func.__name__
         path = request.META["PATH_INFO"]
-
-        VIEWLOGGER_METHODS = [i.lower() for i in conf_settings.VIEWLOGGER_METHODS] if  hasattr(conf_settings, "VIEWLOGGER_METHODS") else ['post','get']
-        EXEMPTED_VIEWS = conf_settings.VIEWLOGGER_EXEMPTED_VIEWS if hasattr(conf_settings, 'VIEWLOGGER_EXEMPTED_VIEWS') else ("")
-        EXEMPTED_PARAMETER = conf_settings.VIEWLOGGER_EXEMPTED_PARAMETER if hasattr(conf_settings,'VIEWLOGGER_EXEMPTED_PARAMETER') else None
-        EXEMPTED_PATHS = conf_settings.VIEWLOGGER_EXEMPTED_PATHS if hasattr(conf_settings, 'VIEWLOGGER_EXEMPTED_PATHS') else ("")
+        if getattr(conf_settings, "VIEWLOGGER_SAVE_DURATION", False) and not "ViewLoggerStart" in request.session:
+            request.session["ViewLoggerStart"] = getattr(time,"time_ns",time.time)()
+            return
+        VIEWLOGGER_METHODS = [i.lower() for i in  getattr(conf_settings, "VIEWLOGGER_METHODS",['post','get'])]
+        EXEMPTED_VIEWS = getattr(conf_settings, 'VIEWLOGGER_EXEMPTED_VIEWS', ("",))
+        EXEMPTED_PARAMETER = getattr(conf_settings,'VIEWLOGGER_EXEMPTED_PARAMETER')
+        EXEMPTED_PATHS = getattr(conf_settings, 'VIEWLOGGER_EXEMPTED_PATHS', ("",))
         if not path in EXEMPTED_PATHS and not view in EXEMPTED_VIEWS and request.method.lower() in VIEWLOGGER_METHODS:
             log = Log()
             requestBody = {}
@@ -44,4 +47,8 @@ class ViewLoggerMiddleware(Object):
             log.view_kwargs = view_kwargs
             log.view_args = view_args
             log.request_method = method
+            now = getattr(time,"time_ns",time.time)()
+            d = (now - request.session.pop("ViewLoggerStart",now))
+            log.duration = "{0:.3f}".format(d)
+            print now,request.session.get("ViewLoggerStart"), log.duration
             log.save()
