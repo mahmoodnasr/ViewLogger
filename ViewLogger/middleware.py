@@ -1,14 +1,28 @@
+import sys
 import time
 from datetime import datetime
-from .models import Log
+
 from django.conf import settings as conf_settings
-import sys
+
+from .models import Log
+
 Object = object
-if sys.version_info >= (3,0,0):
+if sys.version_info >= (3, 0, 0):
     from django.utils.deprecation import MiddlewareMixin
+
     Object = MiddlewareMixin
 
+
 class ViewLoggerMiddleware(Object):
+
+    def process_response(self, request, response):
+        log = request.view_logger_obj
+        now = time.time()
+        duration = now - request.start_time
+        log.duration = "{0:.5f}".format(duration)
+        log.response_status = response.status_code
+        log.save()
+        return response
 
     def process_view(self, request, view_func, view_args, view_kwargs):
         maxColumnSize = 10
@@ -20,12 +34,9 @@ class ViewLoggerMiddleware(Object):
             view = view_func.__name__
         view = view_func.__name__
         path = request.META["PATH_INFO"]
-        if getattr(conf_settings, "VIEWLOGGER_SAVE_DURATION", False) and not "ViewLoggerStart" in request.session:
-            request.session["ViewLoggerStart"] = getattr(time,"time_ns",time.time)()
-            return
-        VIEWLOGGER_METHODS = [i.lower() for i in  getattr(conf_settings, "VIEWLOGGER_METHODS",['post','get'])]
+        VIEWLOGGER_METHODS = [i.lower() for i in getattr(conf_settings, "VIEWLOGGER_METHODS", ['post', 'get'])]
         EXEMPTED_VIEWS = getattr(conf_settings, 'VIEWLOGGER_EXEMPTED_VIEWS', ("",))
-        EXEMPTED_PARAMETER = getattr(conf_settings,'VIEWLOGGER_EXEMPTED_PARAMETER')
+        EXEMPTED_PARAMETER = getattr(conf_settings, 'VIEWLOGGER_EXEMPTED_PARAMETER')
         EXEMPTED_PATHS = getattr(conf_settings, 'VIEWLOGGER_EXEMPTED_PATHS', ("",))
         if not path in EXEMPTED_PATHS and not view in EXEMPTED_VIEWS and request.method.lower() in VIEWLOGGER_METHODS:
             log = Log()
@@ -35,7 +46,8 @@ class ViewLoggerMiddleware(Object):
                     if item not in EXEMPTED_PARAMETER:
                         requestBody[item] = body_data[item]
                     else:
-                        requestBody[item] = len(body_data[item]) * "*" if len(body_data[item]) < maxColumnSize else maxColumnSize * "*" + (5 * ".")
+                        requestBody[item] = len(body_data[item]) * "*" if len(
+                            body_data[item]) < maxColumnSize else maxColumnSize * "*" + (5 * ".")
             else:
                 requestBody = body_data
             method = request.method.upper()
@@ -47,8 +59,6 @@ class ViewLoggerMiddleware(Object):
             log.view_kwargs = view_kwargs
             log.view_args = view_args
             log.request_method = method
-            now = getattr(time,"time_ns",time.time)()
-            d = (now - request.session.pop("ViewLoggerStart",now))
-            log.duration = "{0:.3f}".format(d)
-            print now,request.session.get("ViewLoggerStart"), log.duration
             log.save()
+            request.view_logger_obj = log
+            request.start_time = time.time()

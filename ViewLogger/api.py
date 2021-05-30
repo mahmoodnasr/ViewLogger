@@ -7,6 +7,8 @@ def fetchChangesAPI(changes):
         row["view_name"] = change.view_name
         row["id"] = change.id
         row['url'] = change.url
+        row['duration'] = change.duration
+        row['response_status'] = change.response_status
         row['view_args'] = change.view_args
         row['view_kwargs'] = change.view_kwargs
         reqBody = {}

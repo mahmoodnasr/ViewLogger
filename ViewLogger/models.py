@@ -12,7 +12,8 @@ class Log(models.Model):
     view_kwargs = JSONField(default={})
     done_by = models.CharField(max_length=255)
     done_on = models.DateTimeField(auto_now_add=True)
-    duration = models.DecimalField(null = True, default = 0,max_digits = 5, decimal_places=5)
+    duration = models.CharField(max_length=50,default=None,null=True)
+    response_status = models.CharField(max_length=50,default=None,null=True)
 
     def __unicode__(self):
         return self.id

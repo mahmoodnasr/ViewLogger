@@ -14,6 +14,7 @@ class ViewLogger_Form(forms.Form):
     url = forms.CharField(label="URL", required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
     done_by = forms.CharField(label="Done By", required=False,
                               widget=forms.TextInput(attrs={'class': "form-control"}))
+    response_status = forms.CharField(label="Status", required=False,widget=forms.TextInput(attrs={'class': "form-control"}))
     done_on_from = forms.DateTimeField(label="Done On",
                                   widget=forms.widgets.DateInput(
                                       attrs={'class': 'form-control datePicker', 'type': 'date'}),
@@ -37,4 +38,4 @@ class ViewLogger_Form(forms.Form):
             self.fields['view_name'] = forms.CharField(label="View Name", required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
     class Meta:
         model = Log
-        fields = ('view_name', 'request_method', 'url', 'done_by','done_on_from','done_on_to')
+        fields = ('view_name', 'request_method', 'url', 'done_by','done_on_from','done_on_to','response_status')

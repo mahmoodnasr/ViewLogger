@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import migrations, models
+from django.db import models, migrations
 
 
 class Migration(migrations.Migration):
@@ -14,6 +14,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='log',
             name='duration',
-            field=models.DecimalField(default=0, null=True, max_digits=5, decimal_places=5),
+            field=models.CharField(default=None, max_length=50, null=True),
+        ),
+        migrations.AddField(
+            model_name='log',
+            name='response_status',
+            field=models.CharField(default=None, max_length=50, null=True),
         ),
     ]
