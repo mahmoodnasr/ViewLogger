@@ -73,10 +73,13 @@ def fetchChanges(request):
 
 
 def reportAsExcel(temp, vars,seperated=False):
-    import unicodecsv as csv
+    try:
+        import unicodecsv as csv
+    except:
+        import csv
     response = HttpResponse(content_type='text/csv, application/octet-stream')
     response["Content-Disposition"] = "attachment; filename={}".format(temp.replace(".html", ".csv"))
-    writer = csv.writer(response ,encoding='utf-8',quotechar='"')
+    writer = csv.writer(response ,quotechar='"')
     writer.writerow(['', '', '', 'ViewLogger Data'])
     writer.writerow(['', '', '', '', '', '', '', '', ])
     if seperated:

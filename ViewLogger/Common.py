@@ -9,4 +9,4 @@ def run(excuter,Return=False):
     if Return:
         return out
     else:
-        print (out)
+        print(out)

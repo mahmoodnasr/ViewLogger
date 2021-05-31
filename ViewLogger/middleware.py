@@ -1,8 +1,8 @@
-import sys
-import time
+import time,json,sys
 from datetime import datetime
 
 from django.conf import settings as conf_settings
+from django.shortcuts import HttpResponse
 
 from .models import Log
 
@@ -15,13 +15,28 @@ if sys.version_info >= (3, 0, 0):
 
 class ViewLoggerMiddleware(Object):
 
-    def process_response(self, request, response):
+    def process_exception(self, request, exception):
         log = request.view_logger_obj
-        now = time.time()
-        duration = now - request.start_time
-        log.duration = "{0:.5f}".format(duration)
-        log.response_status = response.status_code
+        log.request_body = {"error":exception.args}
         log.save()
+        html = """
+        <h3>An unexpected error occurred.</h3>
+            <p>Something went seriously wrong, the admins have been notified and they will fix it as fast as they can.
+                Sorry for the inconvenience. <button onclick="goBack()">Go Back</button>  </p>
+                <script> function goBack() { window.history.back(); } </script>
+        """
+        return HttpResponse(html, content_type="text/html")
+
+    def process_response(self, request, response):
+        try:
+            log = request.view_logger_obj
+            now = time.time()
+            duration = now - request.start_time
+            log.duration = "{0:.5f}".format(duration)
+            log.response_status = response.status_code
+            log.save()
+        except:
+            pass
         return response
 
     def process_view(self, request, view_func, view_args, view_kwargs):
