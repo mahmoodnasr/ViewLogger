@@ -19,13 +19,13 @@ class ViewLoggerMiddleware(Object):
         log = request.view_logger_obj
         log.request_body = {"error":exception.args}
         log.save()
-        html = """
-        <h3>An unexpected error occurred.</h3>
-            <p>Something went seriously wrong, the admins have been notified and they will fix it as fast as they can.
-                Sorry for the inconvenience. <button onclick="goBack()">Go Back</button>  </p>
-                <script> function goBack() { window.history.back(); } </script>
-        """
-        return HttpResponse(html, content_type="text/html")
+        # html = """
+        # <h3>An unexpected error occurred.</h3>
+        #     <p>Something went seriously wrong, the admins have been notified and they will fix it as fast as they can.
+        #         Sorry for the inconvenience. <button onclick="goBack()">Go Back</button>  </p>
+        #         <script> function goBack() { window.history.back(); } </script>
+        # """
+        return None
 
     def process_response(self, request, response):
         try:
