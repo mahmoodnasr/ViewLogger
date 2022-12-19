@@ -1,11 +1,12 @@
 from django.db import models
 try:
     from django.db.models import JSONField
-except:
+except ImportError:
     try:
         from jsonfield.fields import JSONField
-    except:
-        raise ModuleNotFoundError("Can't find a JSONField implementation, please install jsonfield if django < 4.0")
+    except ImportError:
+        raise ImportError("Can't find a JSONField implementation, please install jsonfield if django < 4.0")
+
 
 
 class Log(models.Model):
