@@ -37,13 +37,14 @@ def mainViewLogger(request):
             done_by = form.cleaned_data.get('done_by')
             done_on_from = form.cleaned_data.get('done_on_from', None)
             done_on_to = form.cleaned_data.get('done_on_to', None)
-
+            response_status = form.cleaned_data.get('response_status', None)
             kwargs = {}
             args = []
             if view_name != '': kwargs['view_name'] = view_name
             if request_method != '': kwargs['request_method'] = request_method
             if url != '': kwargs['url__contains'] = url
             if done_by != '': kwargs['done_by'] = done_by
+            if response_status != '': kwargs['response_status'] = response_status
             if done_on_from and done_on_to:
                 kwargs['done_on__range'] = [done_on_from,datetime.datetime(done_on_to.year, done_on_to.month, done_on_to.day)+datetime.timedelta(days=1)]
             elif done_on_from and not done_on_to:
@@ -72,10 +73,13 @@ def fetchChanges(request):
 
 
 def reportAsExcel(temp, vars,seperated=False):
-    import unicodecsv as csv
+    try:
+        import unicodecsv as csv
+    except:
+        import csv
     response = HttpResponse(content_type='text/csv, application/octet-stream')
     response["Content-Disposition"] = "attachment; filename={}".format(temp.replace(".html", ".csv"))
-    writer = csv.writer(response ,encoding='utf-8',quotechar='"')
+    writer = csv.writer(response ,quotechar='"')
     writer.writerow(['', '', '', 'ViewLogger Data'])
     writer.writerow(['', '', '', '', '', '', '', '', ])
     if seperated:

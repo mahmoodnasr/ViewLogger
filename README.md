@@ -50,6 +50,11 @@ VIEWLOGGER_EXEMPTED_PARAMETER=["password",]
 VIEWLOGGER_METHODS=["POST"]
 ```
 
+* Save Request Duration
+```python
+VIEWLOGGER_SAVE_DURATION = False
+```
+
 * To archive/load ViewLogger_Log table add VIEWLOGGER_ARCHIVE_DIR to your setting.py
 ```python
 VIEWLOGGER_ARCHIVE_DIR = os.path.join(BASE_DIR, "ViewLoggerArchive")
