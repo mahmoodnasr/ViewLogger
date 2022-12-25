@@ -2,7 +2,13 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import jsonfield.fields
+try:
+    from django.db.models import JSONField
+except ImportError:
+    try:
+        from jsonfield.fields import JSONField
+    except ImportError:
+        raise ImportError("Can't find a JSONField implementation, please install jsonfield if django < 4.0")
 
 
 class Migration(migrations.Migration):
@@ -17,10 +23,10 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(serialize=False, primary_key=True)),
                 ('view_name', models.CharField(max_length=255)),
                 ('request_method', models.CharField(max_length=5)),
-                ('request_body', jsonfield.fields.JSONField(default={})),
+                ('request_body', JSONField(default=dict)),
                 ('url', models.CharField(max_length=255)),
-                ('view_args', jsonfield.fields.JSONField(default=[])),
-                ('view_kwargs', jsonfield.fields.JSONField(default={})),
+                ('view_args', JSONField(default=list)),
+                ('view_kwargs', JSONField(default=dict)),
                 ('done_by', models.CharField(max_length=255)),
                 ('done_on', models.DateTimeField(auto_now_add=True)),
             ],
